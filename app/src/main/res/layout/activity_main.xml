@@ -1,18 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    style="@style/root_layout_style"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <EditText
+        android:id="@+id/one_edit_text"
+        style="@style/input_size_style"
+        android:hint="@string/initial_value"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/two_edit_text"
+        style="@style/input_size_style"
+        android:hint="@string/initial_value"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/three_edit_text"
+        style="@style/input_size_style"
+        android:hint="@string/initial_value"
+        android:inputType="number" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/open_result_button"
+        style="@style/standard_button_style"
+        android:text="@string/start"
+        app:cornerRadius="@dimen/corner_bottom_radius" />
+
+    <TextView
+        android:id="@+id/result_text_view"
+        style="@style/result_text_style"
+        android:text="@string/result" />
+</LinearLayout>
