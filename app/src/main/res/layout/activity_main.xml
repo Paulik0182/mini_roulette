@@ -25,7 +25,7 @@
         android:inputType="number" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/open_result_button"
+        android:id="@+id/start_button"
         style="@style/standard_button_style"
         android:text="@string/start"
         app:cornerRadius="@dimen/corner_bottom_radius" />
