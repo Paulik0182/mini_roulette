@@ -27,9 +27,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        oneWindow = findViewById(R.id.one_edit_text);
-        twoWindow = findViewById(R.id.two_edit_text);
-        threeWindow = findViewById(R.id.three_edit_text);
+        oneWindow = findViewById(R.id.one_text_view);
+        twoWindow = findViewById(R.id.two_text_view);
+        threeWindow = findViewById(R.id.three_text_view);
         resultText = findViewById(R.id.result_text_view);
         startButton = findViewById(R.id.start_button);
     }
