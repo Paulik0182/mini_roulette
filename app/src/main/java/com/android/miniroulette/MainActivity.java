@@ -1,9 +1,12 @@
 package com.android.miniroulette;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Random;
@@ -11,6 +14,7 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity {
 
     private static final int RESULT_REQUEST_CODE = 0;
+    private static final String ONE_WINDOW_RANDOM_NUMBERS_KEY = "random numbers";
 
     private TextView oneWindow = null;
     private TextView twoWindow = null;
@@ -18,12 +22,21 @@ public class MainActivity extends AppCompatActivity {
     private TextView resultText = null;
     private Button startButton = null;
 
+    private int inputValueOneWindow = 0;
+    private int inputValueTwoWindow = 0;
+    private int inputValueThreeWindow = 0;
+    private int result = 0;
+
+    private String textWindow = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
         setListeners();
+
+        Intent intent = getIntent();
     }
 
     private void initViews() {
@@ -35,7 +48,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setListeners() {
-        startButton.setOnClickListener(v -> getResultRandomNumbers());
+        getResultRandomNumbers();
+        startButton.setOnClickListener(v -> openResultScreen(inputValueOneWindow));
+        startButton.setOnClickListener(v -> openResultScreen(inputValueTwoWindow));
+        startButton.setOnClickListener(v -> openResultScreen(inputValueThreeWindow));
+    }
+
+    private void openResultScreen(int value) {
+
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(MainActivity.ONE_WINDOW_RANDOM_NUMBERS_KEY, value);
+        startActivityForResult(intent, RESULT_REQUEST_CODE);
     }
 
     private void getResultRandomNumbers() {
@@ -50,21 +73,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setResultText() {
-        String result = "Ура, Вы победили!";
+        textWindow = "Ура, Вы победили!";
 
-        String inputStrOneWindow = oneWindow.getText().toString();
-        String inputStrTwoWindow = twoWindow.getText().toString();
-        String inputStrThreeWindow = threeWindow.getText().toString();
-
-        int inputValueOneWindow = Integer.parseInt(inputStrOneWindow);
-        int inputValueTwoWindow = Integer.parseInt(inputStrTwoWindow);
-        int inputValueThreeWindow = Integer.parseInt(inputStrThreeWindow);
+        inputValueOneWindow = Integer.parseInt(oneWindow.getText().toString());
+        inputValueTwoWindow = Integer.parseInt(twoWindow.getText().toString());
+        inputValueThreeWindow = Integer.parseInt(threeWindow.getText().toString());
 
         if (inputValueOneWindow == inputValueTwoWindow
                 && inputValueOneWindow == inputValueThreeWindow
         ) {
-            resultText.setText(result);
+            resultText.setText(textWindow);
+            Intent dataIntent = new Intent();
+            dataIntent.putExtra(ONE_WINDOW_RANDOM_NUMBERS_KEY, result);
+            setResult(Activity.RESULT_OK, dataIntent);
+//            finish();
         } else
             resultText.setText("Попробуйте еще!");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == RESULT_REQUEST_CODE && requestCode == Activity.RESULT_OK) {
+            result = data.getIntExtra(MainActivity.ONE_WINDOW_RANDOM_NUMBERS_KEY, -1);
+            resultText.setText(result);
+        } else super.onActivityResult(requestCode, resultCode, data);
     }
 }
