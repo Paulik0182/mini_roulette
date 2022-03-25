@@ -3,7 +3,6 @@ package com.android.miniroulette;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,9 +11,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int RESULT_REQUEST_CODE = 0;
 
-    private EditText oneWindow = null;
-    private EditText twoWindow = null;
-    private EditText threeWindow = null;
+    private TextView oneWindow = null;
+    private TextView twoWindow = null;
+    private TextView threeWindow = null;
     private TextView resultText = null;
     private Button startButton = null;
 
