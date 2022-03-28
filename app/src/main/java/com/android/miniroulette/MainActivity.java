@@ -1,5 +1,6 @@
 package com.android.miniroulette;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,9 +15,9 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity {
 
     private static final int RESULT_REQUEST_CODE = 0;
-    private static final String ONE_WINDOW_RANDOM_NUMBERS_KEY = "random numbers";
-
     private static final int ROULETTE_MAX_VALUE = 3;
+
+    private static final String WIN_RESULT_KEY = "random_numbers";
     private static final String IS_NOT_FIRST_KEY = "IS_NOT_FIRST_KEY";
 
     private TextView oneWindowTv = null;
@@ -28,8 +29,6 @@ public class MainActivity extends AppCompatActivity {
     private int firstWindowValue = 0;
     private int secondWindowValue = 0;
     private int thirstWindowValue = 0;
-
-    private String informationText = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +59,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void openNextScreen() {
         if (isWin(firstWindowValue, secondWindowValue, thirstWindowValue)) {
+            Intent resultIntent = new Intent();
+            @SuppressLint("DefaultLocale") String resultStr = String.format(
+                    "%d %d %d",
+                    firstWindowValue,
+                    secondWindowValue,
+                    thirstWindowValue
+            );
+            resultIntent.putExtra(WIN_RESULT_KEY, resultStr);
+            setResult(Activity.RESULT_OK, resultIntent);
+
             finish();
         } else {
             Intent intent = new Intent(this, MainActivity.class);
@@ -79,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
 
     //заполняем поля случайными цифрами
     private void fillWindowsByNumbers(int first, int second, int third) {
-
         firstWindowValue = first;
         secondWindowValue = second;
         thirstWindowValue = third;
@@ -97,28 +105,26 @@ public class MainActivity extends AppCompatActivity {
 
     private void setResultText() {
         //условие проверки, если все равно то победа, передача данных
+        String informationText = null;
         if (isWin(firstWindowValue, secondWindowValue, thirstWindowValue)) {
-            informationText = "Ура, Вы победили!";
-            Intent dataIntent = new Intent();
-//            dataIntent.putExtra(ONE_WINDOW_RANDOM_NUMBERS_KEY, result);
-            setResult(Activity.RESULT_OK, dataIntent);
-
-            //вариант написания верхних рех строчек
-            //  setResult(Activity.RESULT_OK, new Intent().putExtra(ONE_WINDOW_RANDOM_NUMBERS_KEY, result));
+            resultTextView.setText("Ура, Вы победили!");
         } else {
-            informationText = "Попробуйте еще!";
+            resultTextView.setText("Попробуйте еще!");
         }
-        resultTextView.setText(informationText);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == RESULT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            String resultStr = data.getStringExtra(WIN_RESULT_KEY);
+
             if (!isFirstScreen()) {
-                setResult(Activity.RESULT_OK);
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra(WIN_RESULT_KEY, resultStr);
+                setResult(Activity.RESULT_OK, resultIntent);
                 finish();
             } else {
-                resultTextView.setText("Первый");
+                resultTextView.setText(resultStr);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
