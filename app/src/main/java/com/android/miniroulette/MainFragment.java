@@ -1,18 +1,21 @@
 package com.android.miniroulette;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity {
+public class MainFragment extends Fragment {
 
     private static final int RESULT_REQUEST_CODE = 0;
     private static final int ROULETTE_MAX_VALUE = 3;
@@ -30,11 +33,21 @@ public class MainActivity extends AppCompatActivity {
     private int secondWindowValue = 0;
     private int thirstWindowValue = 0;
 
+    //Создает View
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        initViews();
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        //inflater - разуть (создать)
+        // container - куда раздуть
+        return inflater.inflate(R.layout.activity_main, container, false);
+    }
+
+    //Сразу после создания View.
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        initViews(view);//
         setListeners();
         fillWindowsByNumbers(
                 //передали сразу три случайных числа
@@ -44,12 +57,13 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
-    private void initViews() {
-        oneWindowTv = findViewById(R.id.one_text_view);
-        twoWindowTv = findViewById(R.id.two_text_view);
-        threeWindowTv = findViewById(R.id.three_text_view);
-        resultTextView = findViewById(R.id.result_text_view);
-        startButton = findViewById(R.id.start_button);
+    //Всегда нужно передовать view так как у нее есть findViewById
+    private void initViews(View view) {
+        oneWindowTv = view.findViewById(R.id.one_text_view);
+        twoWindowTv = view.findViewById(R.id.two_text_view);
+        threeWindowTv = view.findViewById(R.id.three_text_view);
+        resultTextView = view.findViewById(R.id.result_text_view);
+        startButton = view.findViewById(R.id.start_button);
     }
 
     private void setListeners() {
@@ -67,16 +81,10 @@ public class MainActivity extends AppCompatActivity {
                     thirstWindowValue
             );
             resultIntent.putExtra(WIN_RESULT_KEY, resultStr);
-            setResult(Activity.RESULT_OK, resultIntent);
-
-            finish();
         } else {
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(getContext(), RootActivity.class);
             intent.putExtra(IS_NOT_FIRST_KEY, true);
             startActivityForResult(intent, RESULT_REQUEST_CODE);
-
-            //вариант написания (сокращения) верхних двух строчер
-//        startActivityForResult(new Intent(this, MainActivity.class), RESULT_REQUEST_CODE);
         }
     }
 
@@ -105,39 +113,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void setResultText() {
         //условие проверки, если все равно то победа, передача данных
-        String informationText = null;
         if (isWin(firstWindowValue, secondWindowValue, thirstWindowValue)) {
             resultTextView.setText("Ура, Вы победили!");
         } else {
             resultTextView.setText("Попробуйте еще!");
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == RESULT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            String resultStr = data.getStringExtra(WIN_RESULT_KEY);
-
-            if (!isFirstScreen()) {
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra(WIN_RESULT_KEY, resultStr);
-                setResult(Activity.RESULT_OK, resultIntent);
-                finish();
-            } else {
-                resultTextView.setText(resultStr);
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    //проверяем первый ли Intent или нет, ставим флажек
-    private boolean isFirstScreen() {
-        Intent intent = getIntent();
-        if (intent == null) {
-            return true;
-        } else {
-            return !intent.hasExtra(IS_NOT_FIRST_KEY);
         }
     }
 }
