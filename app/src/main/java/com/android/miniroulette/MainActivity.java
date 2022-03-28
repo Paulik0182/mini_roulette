@@ -16,18 +16,20 @@ public class MainActivity extends AppCompatActivity {
     private static final int RESULT_REQUEST_CODE = 0;
     private static final String ONE_WINDOW_RANDOM_NUMBERS_KEY = "random numbers";
 
-    private TextView oneWindow = null;
-    private TextView twoWindow = null;
-    private TextView threeWindow = null;
-    private TextView resultText = null;
+    private static final int ROULETTE_MAX_VALUE = 3;
+    private static final String IS_NOT_FIRST_KEY = "IS_NOT_FIRST_KEY";
+
+    private TextView oneWindowTv = null;
+    private TextView twoWindowTv = null;
+    private TextView threeWindowTv = null;
+    private TextView resultTextView = null;
     private Button startButton = null;
 
-    private int inputValueOneWindow = 0;
-    private int inputValueTwoWindow = 0;
-    private int inputValueThreeWindow = 0;
-    private int result = 0;
+    private int firstWindowValue = 0;
+    private int secondWindowValue = 0;
+    private int thirstWindowValue = 0;
 
-    private String textWindow = null;
+    private String informationText = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,67 +37,101 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initViews();
         setListeners();
-
-        Intent intent = getIntent();
+        fillWindowsByNumbers(
+                //передали сразу три случайных числа
+                getRandomRouletteValue(),
+                getRandomRouletteValue(),
+                getRandomRouletteValue()
+        );
     }
 
     private void initViews() {
-        oneWindow = findViewById(R.id.one_text_view);
-        twoWindow = findViewById(R.id.two_text_view);
-        threeWindow = findViewById(R.id.three_text_view);
-        resultText = findViewById(R.id.result_text_view);
+        oneWindowTv = findViewById(R.id.one_text_view);
+        twoWindowTv = findViewById(R.id.two_text_view);
+        threeWindowTv = findViewById(R.id.three_text_view);
+        resultTextView = findViewById(R.id.result_text_view);
         startButton = findViewById(R.id.start_button);
     }
 
     private void setListeners() {
-        getResultRandomNumbers();
-        startButton.setOnClickListener(v -> openResultScreen(inputValueOneWindow));
-        startButton.setOnClickListener(v -> openResultScreen(inputValueTwoWindow));
-        startButton.setOnClickListener(v -> openResultScreen(inputValueThreeWindow));
+        //используется отлько один setOnClickListener, поэтому первые две записи ненужны так как последняя запись нерезапишет предыдущии
+        startButton.setOnClickListener(v -> openNextScreen());
     }
 
-    private void openResultScreen(int value) {
+    private void openNextScreen() {
+        if (isWin(firstWindowValue, secondWindowValue, thirstWindowValue)) {
+            finish();
+        } else {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra(IS_NOT_FIRST_KEY, true);
+            startActivityForResult(intent, RESULT_REQUEST_CODE);
 
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra(MainActivity.ONE_WINDOW_RANDOM_NUMBERS_KEY, value);
-        startActivityForResult(intent, RESULT_REQUEST_CODE);
+            //вариант написания (сокращения) верхних двух строчер
+//        startActivityForResult(new Intent(this, MainActivity.class), RESULT_REQUEST_CODE);
+        }
     }
 
-    private void getResultRandomNumbers() {
-        int max = 3;
+    private int getRandomRouletteValue() {
+        Random random = new Random();//
+        return random.nextInt(ROULETTE_MAX_VALUE);//генерируем случайные числа, от 0 до 3
+        //return new Random().nextInt(ROULETTE_MAX_VALUE); //вариант записи верхних строчек
+    }
 
-        Random random = new Random();
+    //заполняем поля случайными цифрами
+    private void fillWindowsByNumbers(int first, int second, int third) {
 
-        oneWindow.setText(String.valueOf(random.nextInt(max)));
-        twoWindow.setText(String.valueOf(random.nextInt(max)));
-        threeWindow.setText(String.valueOf(random.nextInt(max)));
+        firstWindowValue = first;
+        secondWindowValue = second;
+        thirstWindowValue = third;
+
+        oneWindowTv.setText(String.valueOf(first));
+        twoWindowTv.setText(String.valueOf(second));
+        threeWindowTv.setText(String.valueOf(third));
         setResultText();
     }
 
+    // метод сравнения (да, нет). Если все значения равны
+    private boolean isWin(int first, int second, int third) {
+        return first == second && second == third;
+    }
+
     private void setResultText() {
-        textWindow = "Ура, Вы победили!";
-
-        inputValueOneWindow = Integer.parseInt(oneWindow.getText().toString());
-        inputValueTwoWindow = Integer.parseInt(twoWindow.getText().toString());
-        inputValueThreeWindow = Integer.parseInt(threeWindow.getText().toString());
-
-        if (inputValueOneWindow == inputValueTwoWindow
-                && inputValueOneWindow == inputValueThreeWindow
-        ) {
-            resultText.setText(textWindow);
+        //условие проверки, если все равно то победа, передача данных
+        if (isWin(firstWindowValue, secondWindowValue, thirstWindowValue)) {
+            informationText = "Ура, Вы победили!";
             Intent dataIntent = new Intent();
-            dataIntent.putExtra(ONE_WINDOW_RANDOM_NUMBERS_KEY, result);
+//            dataIntent.putExtra(ONE_WINDOW_RANDOM_NUMBERS_KEY, result);
             setResult(Activity.RESULT_OK, dataIntent);
-//            finish();
-        } else
-            resultText.setText("Попробуйте еще!");
+
+            //вариант написания верхних рех строчек
+            //  setResult(Activity.RESULT_OK, new Intent().putExtra(ONE_WINDOW_RANDOM_NUMBERS_KEY, result));
+        } else {
+            informationText = "Попробуйте еще!";
+        }
+        resultTextView.setText(informationText);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == RESULT_REQUEST_CODE && requestCode == Activity.RESULT_OK) {
-            result = data.getIntExtra(MainActivity.ONE_WINDOW_RANDOM_NUMBERS_KEY, -1);
-            resultText.setText(result);
-        } else super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RESULT_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            if (!isFirstScreen()) {
+                setResult(Activity.RESULT_OK);
+                finish();
+            } else {
+                resultTextView.setText("Первый");
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    //проверяем первый ли Intent или нет, ставим флажек
+    private boolean isFirstScreen() {
+        Intent intent = getIntent();
+        if (intent == null) {
+            return true;
+        } else {
+            return !intent.hasExtra(IS_NOT_FIRST_KEY);
+        }
     }
 }
