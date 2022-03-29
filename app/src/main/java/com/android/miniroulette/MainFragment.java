@@ -1,13 +1,12 @@
 package com.android.miniroulette;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,27 +16,17 @@ import java.util.Random;
 
 public class MainFragment extends Fragment {
 
-    private static final int RESULT_REQUEST_CODE = 0;
-    private static final int ROULETTE_MAX_VALUE = 3;
-
-    private static final String WIN_RESULT_KEY = "random_numbers";
-    private static final String IS_NOT_FIRST_KEY = "IS_NOT_FIRST_KEY";
-
-    private TextView oneWindowTv = null;
-    private TextView twoWindowTv = null;
-    private TextView threeWindowTv = null;
-    private TextView resultTextView = null;
     private Button startButton = null;
-
-    private int firstWindowValue = 0;
-    private int secondWindowValue = 0;
-    private int thirstWindowValue = 0;
+    //    FrameLayout layout;
+    FrameLayout fragmentContainer1;
+    FrameLayout fragmentContainer2;
+    FrameLayout fragmentContainer3;
 
     //Создает View
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //inflater - разуть (создать)
+        //inflater - раздуть (создать)
         // container - куда раздуть
         return inflater.inflate(R.layout.activity_main, container, false);
     }
@@ -49,74 +38,42 @@ public class MainFragment extends Fragment {
 
         initViews(view);//
         setListeners();
-        fillWindowsByNumbers(
-                //передали сразу три случайных числа
-                getRandomRouletteValue(),
-                getRandomRouletteValue(),
-                getRandomRouletteValue()
-        );
     }
 
     //Всегда нужно передовать view так как у нее есть findViewById
     private void initViews(View view) {
-        oneWindowTv = view.findViewById(R.id.one_text_view);
-        twoWindowTv = view.findViewById(R.id.two_text_view);
-        threeWindowTv = view.findViewById(R.id.three_text_view);
-        resultTextView = view.findViewById(R.id.result_text_view);
         startButton = view.findViewById(R.id.start_button);
+//        layout = view.findViewById(R.id.layout);
+        fragmentContainer1 = view.findViewById(R.id.fragment_container_1);
+        fragmentContainer2 = view.findViewById(R.id.fragment_container_2);
+        fragmentContainer3 = view.findViewById(R.id.fragment_container_3);
     }
 
     private void setListeners() {
         //используется отлько один setOnClickListener, поэтому первые две записи ненужны так как последняя запись нерезапишет предыдущии
-        startButton.setOnClickListener(v -> openNextScreen());
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getRandomColor();
+            }
+        });
     }
 
-    private void openNextScreen() {
-        if (isWin(firstWindowValue, secondWindowValue, thirstWindowValue)) {
-            Intent resultIntent = new Intent();
-            @SuppressLint("DefaultLocale") String resultStr = String.format(
-                    "%d %d %d",
-                    firstWindowValue,
-                    secondWindowValue,
-                    thirstWindowValue
-            );
-            resultIntent.putExtra(WIN_RESULT_KEY, resultStr);
-        } else {
-            Intent intent = new Intent(getContext(), RootActivity.class);
-            intent.putExtra(IS_NOT_FIRST_KEY, true);
-            startActivityForResult(intent, RESULT_REQUEST_CODE);
-        }
-    }
+    private void getRandomColor() {
+        Random random = new Random();
+        final int[] color = {Color.BLUE, Color.GREEN, Color.MAGENTA, Color.RED, Color.CYAN};
+        int pos = random.nextInt(color.length);
 
-    private int getRandomRouletteValue() {
-        Random random = new Random();//
-        return random.nextInt(ROULETTE_MAX_VALUE);//генерируем случайные числа, от 0 до 3
-        //return new Random().nextInt(ROULETTE_MAX_VALUE); //вариант записи верхних строчек
-    }
+        int color2 = Color.argb(214, random.nextInt(214), random.nextInt(214), random.nextInt(214));
 
-    //заполняем поля случайными цифрами
-    private void fillWindowsByNumbers(int first, int second, int third) {
-        firstWindowValue = first;
-        secondWindowValue = second;
-        thirstWindowValue = third;
+//        layout.setBackgroundColor(color2);
 
-        oneWindowTv.setText(String.valueOf(first));
-        twoWindowTv.setText(String.valueOf(second));
-        threeWindowTv.setText(String.valueOf(third));
-        setResultText();
-    }
+//        fragmentContainer1.setBackgroundColor(color2);
+//        fragmentContainer2.setBackgroundColor(color2);
+//        fragmentContainer3.setBackgroundColor(color2);
 
-    // метод сравнения (да, нет). Если все значения равны
-    private boolean isWin(int first, int second, int third) {
-        return first == second && second == third;
-    }
-
-    private void setResultText() {
-        //условие проверки, если все равно то победа, передача данных
-        if (isWin(firstWindowValue, secondWindowValue, thirstWindowValue)) {
-            resultTextView.setText("Ура, Вы победили!");
-        } else {
-            resultTextView.setText("Попробуйте еще!");
-        }
+        fragmentContainer1.setBackgroundColor(color[pos]);
+        fragmentContainer2.setBackgroundColor(color[pos]);
+        fragmentContainer3.setBackgroundColor(color[pos]);
     }
 }

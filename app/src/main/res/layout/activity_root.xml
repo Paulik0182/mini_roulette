@@ -4,12 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <Button
-        android:id="@+id/show_fragment_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/show_fragment_button" />
-
     <FrameLayout
         android:id="@+id/fragment_container_1"
         android:layout_width="match_parent"
