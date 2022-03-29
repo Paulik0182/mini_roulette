@@ -8,12 +8,27 @@
         android:id="@+id/show_fragment_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Показать фрагмент" />
+        android:text="@string/show_fragment_button" />
 
     <FrameLayout
-        android:id="@+id/fragment_container"
+        android:id="@+id/fragment_container_1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#12aa33" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/green" />
+
+    <FrameLayout
+        android:id="@+id/fragment_container_2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/pink" />
+
+    <FrameLayout
+        android:id="@+id/fragment_container_3"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/light_blue" />
 
 </LinearLayout>
