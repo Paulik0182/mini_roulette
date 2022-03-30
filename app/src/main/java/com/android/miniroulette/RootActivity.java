@@ -13,9 +13,9 @@ public class RootActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_root);
 
-        Fragment fragment1 = new MainFragment();
-        Fragment fragment2 = new MainFragment();
-        Fragment fragment3 = new MainFragment();
+        Fragment fragment1 = new ColorFragment();
+        Fragment fragment2 = new ColorFragment();
+        Fragment fragment3 = new ColorFragment();
 
         getSupportFragmentManager()
                 .beginTransaction()
